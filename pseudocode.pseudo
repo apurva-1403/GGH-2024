@@ -1,57 +1,57 @@
-Pseudocode 
+PSEUDOCODE
 
-**parse_interface_monitor_output(interface_output):**
+parse_interface_monitor_output(interface_output):
 1. Initialize an empty list `trace` to store transaction information.
 2. Split the provided `interface_output` string by line breaks (`\n`) and remove leading/trailing whitespace (`.strip()`).
-3. **Iterate through each line in the split output:**
-    * Split the line into `timestamp`, `txn_type`, and `data` using a space delimiter.
-    * Create a dictionary `txn_info` to store transaction details.
-    * Set `txn_info["Timestamp"]` to the converted integer value of `timestamp`.
-    * Set `txn_info["TxnType"]` to the `txn_type` string.
-        * If `txn_type` is "Rd", set `txn_info["Data"]` to "-".
-        * Otherwise, set `txn_info["Data"]` to the `data` string with leading/trailing single quotes removed (`.strip("'")`).
-    * Append `txn_info` to the `trace` list.
+3. Iterate through each line in the split output:
+    - Split the line into `timestamp`, `txn_type`, and `data` using a space delimiter.
+    - Create a dictionary `txn_info` to store transaction details.
+    - Set `txn_info["Timestamp"]` to the converted integer value of `timestamp`.
+    - Set `txn_info["TxnType"]` to the `txn_type` string.
+         -> If `txn_type` is "Rd", set `txn_info["Data"]` to "-".
+         -> Otherwise, set `txn_info["Data"]` to the `data` string with leading/trailing single quotes removed (`.strip("'")`).
+    - Append `txn_info` to the `trace` list.
 4. Return the `trace` list containing information about each transaction.
 
 
-**calculate_average_latency(trace):**
+calculate_average_latency(trace):
 1. Initialize variables:
-    * `total_latency` to 0 (to accumulate latency values).
-    * `num_transactions` to 0 (to count read transactions).
-    * `last_request_time` to None (to store the timestamp of the previous read transaction).
-2. **Iterate through each entry in the `trace`:**
-    * Check if the entry's `TxnType` is "Rd".
-        * If yes:
-            * Set `request_time` to the entry's `Timestamp`.
-            * If `last_request_time` is not None (meaning there was a previous read):
-                * Calculate `latency` as the difference between `request_time` and `last_request_time`.
-                * Add `latency` to `total_latency`.
-                * Increment `num_transactions` by 1.
-            * Set `last_request_time` to `request_time` for the next iteration.
-3. **Check for any read transactions:**
-    * If `num_transactions` is 0 (no reads), return 0 (no average latency to calculate).
+    - `total_latency` to 0 (to accumulate latency values).
+    - `num_transactions` to 0 (to count read transactions).
+    - `last_request_time` to None (to store the timestamp of the previous read transaction).
+2. Iterate through each entry in the `trace`:
+     Check if the entry's `TxnType` is "Rd".
+         If yes:
+            - Set `request_time` to the entry's `Timestamp`.
+            - If `last_request_time` is not None (meaning there was a previous read):
+                -> Calculate `latency` as the difference between `request_time` and `last_request_time`.
+                -> Add `latency` to `total_latency`.
+                -> Increment `num_transactions` by 1.
+            - Set `last_request_time` to `request_time` for the next iteration.
+3. Check for any read transactions:
+    - If `num_transactions` is 0 (no reads), return 0 (no average latency to calculate).
 4. Calculate `average_latency` by dividing `total_latency` by `num_transactions`.
 5. Return the `average_latency`.
 
 
-**calculate_bandwidth(trace, data_width):**
+calculate_bandwidth(trace, data_width):
 1. Initialize `total_bytes_transferred` to 0 (to accumulate transferred bytes).
-2. **Iterate through each entry in the `trace`:**
-    * Check if the entry's `TxnType` is "Wr".
-        * If yes:
-            * Get the data from the entry (`entry["Data"]`).
-            * Check if the data is not empty (not "-").
-                * If yes:
-                    * Calculate the size of the data in bytes by dividing the data length by the data width divided by 8 (conversion from bits to bytes).
-                    * Add the calculated size to `total_bytes_transferred`.
+2. Iterate through each entry in the `trace`:
+     Check if the entry's `TxnType` is "Wr".
+        - If yes:
+            -> Get the data from the entry (`entry["Data"]`).
+            -> Check if the data is not empty (not "-").
+                - If yes:
+                    -> Calculate the size of the data in bytes by dividing the data length by the data width divided by 8 (conversion from bits to bytes).
+                    -> Add the calculated size to `total_bytes_transferred`.
 3. Get the total number of cycles (`total_cycles`) from the length of the `trace`.
-4. **Check for any cycles:**
-    * If `total_cycles` is 0 (no cycles), return 0 (no bandwidth to calculate).
+4. Check for any cycles:
+    - If `total_cycles` is 0 (no cycles), return 0 (no bandwidth to calculate).
 5. Calculate `bandwidth` by dividing `total_bytes_transferred` by `total_cycles`.
 6. Return the `bandwidth`.
 
 
-**process_simulator_output(trace, data_width):**
+process_simulator_output(trace, data_width):
 1. Call `calculate_average_latency(trace)` and store the result in `average_latency`.
 2. Call `calculate_bandwidth(trace, data_width)` and store the result in `bandwidth`.
 3. Print "Average Latency:" followed by `average_latency` and "cycles".
